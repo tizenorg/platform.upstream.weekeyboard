@@ -1,6 +1,6 @@
 Name:           weekeyboard
 Version:        0.0.1
-Release:        1
+Release:        2
 License:        Apache-2.0
 Summary:        Virtual Keyboard Application
 Url:            http://www.enlightenment.org/
