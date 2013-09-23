@@ -1,3 +1,6 @@
+* Mon Sep 23 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> accepted/tizen/20130918.203201@e8b7d28
+- Print output messages to stderr instead of stdout
+
 * Wed Sep 18 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> upstream/0.0.1@d5a9506
 - Updated package revision
 

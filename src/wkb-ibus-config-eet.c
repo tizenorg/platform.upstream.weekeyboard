@@ -56,7 +56,6 @@ _config_section_set_value(struct _config_section *base, const char *section, con
 {
    return base->set_value(base, section, name, value);
 }
-
 static void *
 _config_section_get_value(struct _config_section *base, const char *section, const char *name)
 {
@@ -920,7 +919,7 @@ wkb_ibus_config_eet_new(const char *path)
 
    if (!(ef = eet_open(path, mode)))
      {
-        printf("Error opening eet file '%s' for %s\n", path, mode == EET_FILE_MODE_READ ? "read" : "write");
+        fprintf(stderr,"Error opening eet file '%s' for %s\n", path, mode == EET_FILE_MODE_READ ? "read" : "write");
         wkb_ibus_config_eet_free(eet);
         return NULL;
      }
@@ -935,7 +934,7 @@ wkb_ibus_config_eet_new(const char *path)
    wkb_ibus_config_eet_set_defaults(eet);
    if (!eet_data_write(ef, eet->ibus_edd, "ibus", eet->ibus_config, EINA_TRUE))
      {
-        printf("Error creating eet file '%s'\n", path);
+        fprintf(stderr,"Error creating eet file '%s'\n", path);
         wkb_ibus_config_eet_free(eet);
         eet = NULL;
      }

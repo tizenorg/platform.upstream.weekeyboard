@@ -26,13 +26,13 @@ main (int argc, char *argv[])
 
    if (!eina_init())
      {
-        printf("Error initializing eina");
+        fprintf(stderr,"Error initializing eina");
         return 1;
      }
 
    if (!eet_init())
      {
-        printf("Error initializing eet");
+        fprintf(stderr,"Error initializing eet");
         return 1;
      }
 

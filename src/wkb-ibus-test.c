@@ -25,7 +25,7 @@
 static void
 _finish(int foo)
 {
-   printf("FINISH\n");
+   fprintf(stderr,"FINISH\n");
    wkb_ibus_shutdown();
 }
 
@@ -40,19 +40,19 @@ main (int argc, char *argv[])
 {
    if (!ecore_init())
      {
-        printf("Error initializing ecore");
+        fprintf(stderr,"Error initializing ecore");
         return 1;
      }
 
    if (!eldbus_init())
      {
-        printf("Error initializing eldbus");
+        fprintf(stderr,"Error initializing eldbus");
         return 1;
      }
 
    if (!wkb_ibus_init())
      {
-        printf("Error initializing ibus");
+        fprintf(stderr,"Error initializing ibus");
         return 1;
      }
 
