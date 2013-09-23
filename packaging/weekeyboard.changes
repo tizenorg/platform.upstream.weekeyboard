@@ -1,3 +1,6 @@
+* Mon Sep 23 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> accepted/tizen/20130918.203201@76fb874
+- Force engine to Wayland SHM
+
 * Mon Sep 23 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> accepted/tizen/20130918.203201@e8b7d28
 - Print output messages to stderr instead of stdout
 

@@ -540,7 +540,7 @@ _wkb_check_evas_engine(struct weekeyboard *wkb)
         goto err;
      }
 
-   wkb->ee_engine = env;
+   wkb->ee_engine = "wayland_shm";//env;
    ret = EINA_TRUE;
 
 err:
