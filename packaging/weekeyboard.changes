@@ -1,3 +1,6 @@
+* Thu Sep 26 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> accepted/tizen/20130925.220645@4201b07
+- Revert "Force engine to Wayland SHM"
+
 * Wed Sep 25 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> submit/tizen/20130923.214204@41c7042
 - Fix handling of "Enter" key press
 
