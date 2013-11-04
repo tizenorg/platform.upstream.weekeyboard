@@ -1,3 +1,6 @@
+* Wed Dec 18 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> accepted/tizen_ivi_stable/20131119.040406@5fa32b2
+- Added dependency of ibus engines
+
 * Mon Nov 04 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> upstream/0.0.2@978eca4
 - Update packaging for version 0.0.2
 - Updated package revision
