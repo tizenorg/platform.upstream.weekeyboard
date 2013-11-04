@@ -21,6 +21,9 @@ BuildRequires:  pkgconfig(eldbus)
 BuildRequires:  ibus
 
 Requires:       ibus
+Requires:       ibus-hangul
+Requires:       ibus-libpinyin
+
 
 %description
 Weekeyboard is virtual keyboard application written in EFL and
@@ -36,12 +39,6 @@ make %{?_smp_mflags}
 
 %install
 %make_install
-
-
-%post
-
-%postun
-
 
 %files
 %manifest %{name}.manifest
