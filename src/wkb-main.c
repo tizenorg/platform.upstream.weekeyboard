@@ -29,6 +29,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "wkb-log.h"
+#include "wkb-ibus.h"
+
 #include "input-method-client-protocol.h"
 #include "text-client-protocol.h"
 
@@ -54,7 +57,6 @@ struct weekeyboard
    uint32_t preedit_style;
    uint32_t content_hint;
    uint32_t content_purpose;
-   uint32_t serial;
    uint32_t surrounding_cursor;
 
    Eina_Bool context_changed;
@@ -63,7 +65,8 @@ struct weekeyboard
 static void
 _cb_wkb_delete_request(Ecore_Evas *ee EINA_UNUSED)
 {
-   ecore_main_loop_quit();
+   if (!wkb_ibus_shutdown())
+      ecore_main_loop_quit();
 }
 
 static char *
@@ -88,7 +91,7 @@ _wkb_commit_preedit_str(struct weekeyboard *wkb)
       return;
 
    wl_input_method_context_cursor_position(wkb->im_ctx, 0, 0);
-   wl_input_method_context_commit_string(wkb->im_ctx, wkb->serial, wkb->preedit_str);
+   wl_input_method_context_commit_string(wkb->im_ctx, wkb_ibus_input_context_serial(), wkb->preedit_str);
 
    if (wkb->surrounding_text)
      {
@@ -119,7 +122,7 @@ _wkb_send_preedit_str(struct weekeyboard *wkb, int cursor)
       index = cursor;
 
    wl_input_method_context_preedit_cursor(wkb->im_ctx, index);
-   wl_input_method_context_preedit_string(wkb->im_ctx, wkb->serial, wkb->preedit_str, wkb->preedit_str);
+   wl_input_method_context_preedit_string(wkb->im_ctx, wkb_ibus_input_context_serial(), wkb->preedit_str, wkb->preedit_str);
 }
 
 static void
@@ -171,35 +174,11 @@ _cb_wkb_on_key_down(void *data, Evas_Object *obj, const char *emission EINA_UNUS
 
    if (_wkb_ignore_key(wkb, key))
      {
-        printf("Ignoring key '%s'\n", key);
+        DBG("Ignoring key: '%s'", key);
         goto end;
      }
-   else if (strcmp(key, "backspace") == 0)
-     {
-        if (strlen(wkb->preedit_str) == 0)
-             wl_input_method_context_delete_surrounding_text(wkb->im_ctx, -1, 1);
-        else
-          {
-             wkb->preedit_str[strlen(wkb->preedit_str) - 1] = '\0';
-             _wkb_send_preedit_str(wkb, -1);
-          }
 
-        goto end;
-     }
-   else if (strcmp(key, "enter") == 0)
-     {
-        _wkb_commit_preedit_str(wkb);
-        /* wl_input_method_context_keysym(wkb->im_ctx, wkb->serial, time, XKB_KEY_Return, key_state, mod_mask); */
-        goto end;
-     }
-   else if (strcmp(key, "space") == 0)
-     {
-        key = " ";
-     }
-
-   printf("KEY = '%s'\n", key);
-
-   _wkb_update_preedit_str(wkb, key);
+   wkb_ibus_input_context_process_key_event(key);
 
 end:
    free(src);
@@ -208,26 +187,27 @@ end:
 static void
 _wkb_im_ctx_surrounding_text(void *data, struct wl_input_method_context *im_ctx, const char *text, uint32_t cursor, uint32_t anchor)
 {
+#if 0
    struct weekeyboard *wkb = data;
 
-   printf("%s()\n", __FUNCTION__);
    free(wkb->surrounding_text);
    wkb->surrounding_text = strdup(text);
    wkb->surrounding_cursor = cursor;
+#endif
 }
 
 static void
 _wkb_im_ctx_reset(void *data, struct wl_input_method_context *im_ctx)
 {
+#if 0
    struct weekeyboard *wkb = data;
-
-   printf("%s()\n", __FUNCTION__);
 
    if (strlen(wkb->preedit_str))
      {
         free(wkb->preedit_str);
         wkb->preedit_str = strdup("");
      }
+#endif
 }
 
 static void
@@ -235,7 +215,7 @@ _wkb_im_ctx_content_type(void *data, struct wl_input_method_context *im_ctx, uin
 {
    struct weekeyboard *wkb = data;
 
-   printf("%s(): im_context = %p hint = %d purpose = %d\n", __FUNCTION__, im_ctx, hint, purpose);
+   DBG("im_context = %p hint = %d purpose = %d", im_ctx, hint, purpose);
 
    if (!wkb->context_changed)
       return;
@@ -264,13 +244,14 @@ _wkb_im_ctx_content_type(void *data, struct wl_input_method_context *im_ctx, uin
 static void
 _wkb_im_ctx_invoke_action(void *data, struct wl_input_method_context *im_ctx, uint32_t button, uint32_t index)
 {
+#if 0
    struct weekeyboard *wkb = data;
 
-   printf("%s()\n", __FUNCTION__);
    if (button != BTN_LEFT)
       return;
 
    _wkb_send_preedit_str(wkb, index);
+#endif
 }
 
 static void
@@ -278,19 +259,21 @@ _wkb_im_ctx_commit_state(void *data, struct wl_input_method_context *im_ctx, uin
 {
    struct weekeyboard *wkb = data;
 
-   printf("%s()\n", __FUNCTION__);
    if (wkb->surrounding_text)
-      fprintf(stderr, "Surrounding text updated: %s\n", wkb->surrounding_text);
+      INF("Surrounding text updated: %s", wkb->surrounding_text);
 
-   wkb->serial = serial;
+   wkb_ibus_input_context_set_serial(serial);
+#if 0
    /* FIXME */
-   wl_input_method_context_language(im_ctx, wkb->serial, "en");//wkb->language);
-   wl_input_method_context_text_direction(im_ctx, wkb->serial, WL_TEXT_INPUT_TEXT_DIRECTION_LTR);//wkb->text_direction);
+   wl_input_method_context_language(im_ctx, wkb_ibus_input_context_serial(), "en");//wkb->language);
+   wl_input_method_context_text_direction(im_ctx, wkb_ibus_input_context_serial(), WL_TEXT_INPUT_TEXT_DIRECTION_LTR);//wkb->text_direction);
+#endif
 }
 
 static void
 _wkb_im_ctx_preferred_language(void *data, struct wl_input_method_context *im_ctx, const char *language)
 {
+#if 0
    struct weekeyboard *wkb = data;
 
    if (language && wkb->language && !strcmp(language, wkb->language))
@@ -305,8 +288,9 @@ _wkb_im_ctx_preferred_language(void *data, struct wl_input_method_context *im_ct
    if (language)
      {
         wkb->language = strdup(language);
-        printf("Language changed, new: '%s\n", language);
+        INF("Language changed, new: '%s'", language);
      }
+#endif
 }
 
 static const struct wl_input_method_context_listener wkb_im_context_listener = {
@@ -322,7 +306,8 @@ static void
 _wkb_im_activate(void *data, struct wl_input_method *input_method, struct wl_input_method_context *im_ctx)
 {
    struct weekeyboard *wkb = data;
-   struct wl_array modifiers_map;
+
+   DBG("Activate");
 
    if (wkb->im_ctx)
       wl_input_method_context_destroy(wkb->im_ctx);
@@ -333,16 +318,21 @@ _wkb_im_activate(void *data, struct wl_input_method *input_method, struct wl_inp
    wkb->preedit_str = strdup("");
    wkb->content_hint = WL_TEXT_INPUT_CONTENT_HINT_NONE;
    wkb->content_purpose = WL_TEXT_INPUT_CONTENT_PURPOSE_NORMAL;
+
    free(wkb->language);
    wkb->language = NULL;
+
    free(wkb->surrounding_text);
    wkb->surrounding_text = NULL;
-   wkb->serial = 0;
+
+   wkb_ibus_input_context_set_serial(0);
 
    wkb->im_ctx = im_ctx;
    wl_input_method_context_add_listener(im_ctx, &wkb_im_context_listener, wkb);
+   wkb_ibus_input_context_create(im_ctx);
 
-   /*
+#if 0
+   struct wl_array modifiers_map;
    wl_array_init(&modifiers_map);
 
    keysym_modifiers_add(&modifiers_map, "Shift");
@@ -357,9 +347,9 @@ _wkb_im_activate(void *data, struct wl_input_method *input_method, struct wl_inp
    */
 
    /* FIXME */
-   wl_input_method_context_language(im_ctx, wkb->serial, "en");//wkb->language);
-   wl_input_method_context_text_direction(im_ctx, wkb->serial, WL_TEXT_INPUT_TEXT_DIRECTION_LTR);//wkb->text_direction);
-
+   wl_input_method_context_language(im_ctx, wkb_ibus_input_context_serial(), "en");//wkb->language);
+   wl_input_method_context_text_direction(im_ctx, wkb_ibus_input_context_serial(), WL_TEXT_INPUT_TEXT_DIRECTION_LTR);//wkb->text_direction);
+#endif
    wkb->context_changed = EINA_TRUE;
    evas_object_show(wkb->edje_obj);
 }
@@ -369,11 +359,16 @@ _wkb_im_deactivate(void *data, struct wl_input_method *input_method, struct wl_i
 {
    struct weekeyboard *wkb = data;
 
-   if (!wkb->im_ctx)
-      return;
+   DBG("Deactivate");
 
-   wl_input_method_context_destroy(wkb->im_ctx);
-   wkb->im_ctx = NULL;
+   wkb_ibus_input_context_destroy();
+
+   if (wkb->im_ctx)
+     {
+        wl_input_method_context_destroy(wkb->im_ctx);
+        wkb->im_ctx = NULL;
+     }
+
    evas_object_hide(wkb->edje_obj);
 }
 
@@ -392,7 +387,7 @@ _wkb_ui_setup(struct weekeyboard *wkb)
    char *ignore_keys;
 
    ecore_evas_alpha_set(wkb->ee, EINA_TRUE);
-   ecore_evas_title_set(wkb->ee, "EFL virtual keyboard");
+   ecore_evas_title_set(wkb->ee, "Weekeyboard");
 
    evas = ecore_evas_get(wkb->ee);
    wkb->edje_obj = edje_object_add(evas);
@@ -406,12 +401,12 @@ _wkb_ui_setup(struct weekeyboard *wkb)
       w = 600;
 
    sprintf(path, PKGDATADIR"/default_%d.edj", w);
-   printf("Loading edje file: '%s'\n", path);
+   DBG("Loading edje file: '%s'", path);
 
    if (!edje_object_file_set(wkb->edje_obj, path, "main"))
      {
         int err = edje_object_load_error_get(wkb->edje_obj);
-        fprintf(stderr, "error loading the edje file:%s\n", edje_load_error_str(err));
+        ERR("Unable to load the edje file: '%s'", edje_load_error_str(err));
         return EINA_FALSE;
      }
 
@@ -454,11 +449,11 @@ _wkb_ui_setup(struct weekeyboard *wkb)
    ignore_keys = edje_file_data_get(path, "ignore-keys");
    if (!ignore_keys)
      {
-        printf("Special keys file not found in '%s'\n", path);
+        ERR("Special keys file not found in: '%s'", path);
         goto end;
      }
 
-   printf("Got ignore keys = %s\n", ignore_keys);
+   DBG("Got ignore keys: '%s'", ignore_keys);
    wkb->ignore_keys = eina_str_split(ignore_keys, "\n", 0);
    free(ignore_keys);
 
@@ -489,6 +484,7 @@ _wkb_setup(struct weekeyboard *wkb)
      }
 
    /* Set input panel surface */
+   DBG("Setting up input panel");
    wkb->win = ecore_evas_wayland_window_get(wkb->ee);
    ecore_wl_window_type_set(wkb->win, ECORE_WL_WINDOW_TYPE_NONE);
    wkb->surface = ecore_wl_window_surface_create(wkb->win);
@@ -496,6 +492,7 @@ _wkb_setup(struct weekeyboard *wkb)
    wl_input_panel_surface_set_toplevel(ips, wkb->output, WL_INPUT_PANEL_SURFACE_POSITION_CENTER_BOTTOM);
 
    /* Input method listener */
+   DBG("Adding wl_input_method listener");
    wl_input_method_add_listener(wkb->im, &wkb_im_listener, wkb);
 }
 
@@ -505,13 +502,15 @@ _wkb_free(struct weekeyboard *wkb)
    if (wkb->im_ctx)
       wl_input_method_context_destroy(wkb->im_ctx);
 
+   if (wkb->edje_obj)
+      evas_object_del(wkb->edje_obj);
+
    if (wkb->ignore_keys)
      {
         free(*wkb->ignore_keys);
         free(wkb->ignore_keys);
      }
 
-   evas_object_del(wkb->edje_obj);
    free(wkb->preedit_str);
    free(wkb->surrounding_text);
 }
@@ -530,13 +529,13 @@ _wkb_check_evas_engine(struct weekeyboard *wkb)
            env = "wayland_egl";
         else
           {
-             printf("ERROR: Ecore_Evas does must be compiled with support for Wayland engines\n");
+             ERR("ERROR: Ecore_Evas does must be compiled with support for Wayland engines");
              goto err;
           }
      }
    else if (strcmp(env, "wayland_shm") != 0 && strcmp(env, "wayland_egl") != 0)
      {
-        printf("ERROR: ECORE_EVAS_ENGINE must be set to either 'wayland_shm' or 'wayland_egl'\n");
+        ERR("ERROR: ECORE_EVAS_ENGINE must be set to either 'wayland_shm' or 'wayland_egl'");
         goto err;
      }
 
@@ -547,55 +546,72 @@ err:
    return ret;
 }
 
+static Eina_Bool
+_wkb_check_ibus_connection(void *data)
+{
+   static int tries = 0;
+
+   if (tries++ > 5)
+     {
+        CRITICAL("Unable to establish connection to IBus.");
+        return ECORE_CALLBACK_DONE;
+     }
+
+   return !wkb_ibus_is_connected();
+}
+
 int
 main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 {
    struct weekeyboard wkb = {0};
    int ret = EXIT_FAILURE;
 
-   if (!ecore_init())
+   if (!wkb_log_init("weekeyboard"))
       return ret;
 
    if (!ecore_evas_init())
-      goto ecore_err;
-
-   if (!edje_init())
       goto ee_err;
 
-   if (!_wkb_check_evas_engine(&wkb))
+   if (!edje_init())
       goto edj_err;
 
-   printf("SELECTED ENGINE = %s\n", wkb.ee_engine);
+   if (!_wkb_check_evas_engine(&wkb))
+      goto engine_err;
+
+   DBG("Selected engine: '%s'", wkb.ee_engine);
    wkb.ee = ecore_evas_new(wkb.ee_engine, 0, 0, 1, 1, "frame=0");
 
    if (!wkb.ee)
      {
-        printf("ERROR: Unable to create Ecore_Evas object\n");
+        ERR("ERROR: Unable to create Ecore_Evas object");
         goto edj_err;
      }
 
    _wkb_setup(&wkb);
 
+   wkb_ibus_init();
+
    if (!_wkb_ui_setup(&wkb))
       goto end;
 
+   wkb_ibus_connect();
+   ecore_timer_add(1, _wkb_check_ibus_connection, NULL);
    ecore_main_loop_begin();
 
    ret = EXIT_SUCCESS;
 
-   _wkb_free(&wkb);
-
 end:
+   _wkb_free(&wkb);
    ecore_evas_free(wkb.ee);
 
-edj_err:
+engine_err:
    edje_shutdown();
 
-ee_err:
+edj_err:
    ecore_evas_shutdown();
 
-ecore_err:
-   ecore_shutdown();
+ee_err:
+   wkb_log_shutdown();
 
    return ret;
 }

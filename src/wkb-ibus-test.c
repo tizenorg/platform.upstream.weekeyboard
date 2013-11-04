@@ -15,55 +15,55 @@
  */
 
 #include "wkb-ibus.h"
+#include "wkb-log.h"
 
 #define _GNU_SOURCE
 #include <signal.h>
 
+#include <Eina.h>
 #include <Ecore.h>
 #include <Eldbus.h>
+#include <Efreet.h>
 
 static void
 _finish(int foo)
 {
-   printf("FINISH\n");
    wkb_ibus_shutdown();
-}
-
-static Eina_Bool
-_connect_timer(void *data)
-{
-   return !wkb_ibus_connect();
 }
 
 int
 main (int argc, char *argv[])
 {
+   int ret = 1;
+
+   if (!wkb_log_init("ibus-test"))
+      return 1;
+
    if (!ecore_init())
      {
-        printf("Error initializing ecore");
-        return 1;
-     }
-
-   if (!eldbus_init())
-     {
-        printf("Error initializing eldbus");
-        return 1;
+        ERR("Error initializing ecore");
+        goto ecore_err;
      }
 
    if (!wkb_ibus_init())
      {
-        printf("Error initializing ibus");
-        return 1;
+        ERR("Error initializing ibus");
+        goto ibus_err;
      }
 
-   ecore_timer_add(1, _connect_timer, NULL);
+   wkb_ibus_connect();
 
    signal(SIGTERM, _finish);
    signal(SIGINT, _finish);
 
    ecore_main_loop_begin();
+   ret = 0;
 
-   eldbus_shutdown();
+ibus_err:
    ecore_shutdown();
-   return 0;
+
+ecore_err:
+   wkb_log_shutdown();
+
+   return ret;
 }

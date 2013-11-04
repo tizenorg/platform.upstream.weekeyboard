@@ -18,11 +18,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Eina.h>
 #include <Eldbus.h>
 
 #include "wkb-ibus.h"
+#include "wkb-ibus-defs.h"
+#include "wkb-ibus-config-eet.h"
+#include "wkb-log.h"
 
-#define CONFIG_CHECK_MESSAGE_ERRORS(_msg) \
+static struct wkb_ibus_config_eet *_conf_eet = NULL;
+
+#define _config_check_message_errors(_msg) \
    do \
      { \
         const char *error, *error_msg; \
@@ -32,7 +38,7 @@
              return NULL; \
           } \
         DBG("Message '%s' with signature '%s'", eldbus_message_member_get(_msg), eldbus_message_signature_get(_msg)); \
-     } while (0);
+     } while (0)
 
 static Eldbus_Message *
 _config_set_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *msg)
@@ -40,7 +46,7 @@ _config_set_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *m
    const char *section, *name;
    Eldbus_Message_Iter *value;
 
-   CONFIG_CHECK_MESSAGE_ERRORS(msg)
+   _config_check_message_errors(msg);
 
    if (!eldbus_message_arguments_get(msg, "ssv", &section, &name, &value))
      {
@@ -50,6 +56,8 @@ _config_set_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *m
 
    DBG("section: '%s', name: '%s', value: '%p'", section, name, value);
 
+   wkb_ibus_config_eet_set_value(_conf_eet, section, name, value);
+
    return NULL;
 }
 
@@ -57,8 +65,10 @@ static Eldbus_Message *
 _config_get_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *msg)
 {
    const char *section, *name;
+   Eldbus_Message *reply = NULL;
+   Eldbus_Message_Iter *iter;
 
-   CONFIG_CHECK_MESSAGE_ERRORS(msg)
+   _config_check_message_errors(msg);
 
    if (!eldbus_message_arguments_get(msg, "ss", &section, &name))
      {
@@ -68,15 +78,21 @@ _config_get_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *m
 
    DBG("section: '%s', name: '%s'", section, name);
 
-   return NULL;
+   reply = eldbus_message_method_return_new(msg);
+   iter = eldbus_message_iter_get(reply);
+   wkb_ibus_config_eet_get_value(_conf_eet, section, name, iter);
+
+   return reply;
 }
 
 static Eldbus_Message *
 _config_get_values(const Eldbus_Service_Interface *iface, const Eldbus_Message *msg)
 {
    const char *section;
+   Eldbus_Message *reply = NULL;
+   Eldbus_Message_Iter *iter;
 
-   CONFIG_CHECK_MESSAGE_ERRORS(msg)
+   _config_check_message_errors(msg);
 
    if (!eldbus_message_arguments_get(msg, "s", &section))
      {
@@ -86,7 +102,11 @@ _config_get_values(const Eldbus_Service_Interface *iface, const Eldbus_Message *
 
    DBG("section: '%s'", section);
 
-   return NULL;
+   reply = eldbus_message_method_return_new(msg);
+   iter = eldbus_message_iter_get(reply);
+   wkb_ibus_config_eet_get_values(_conf_eet, section, iter);
+
+   return reply;
 }
 
 static Eldbus_Message *
@@ -94,7 +114,7 @@ _config_unset_value(const Eldbus_Service_Interface *iface, const Eldbus_Message 
 {
    const char *section, *name;
 
-   CONFIG_CHECK_MESSAGE_ERRORS(msg)
+   _config_check_message_errors(msg);
 
    if (!eldbus_message_arguments_get(msg, "ss", &section, &name))
      {
@@ -103,6 +123,8 @@ _config_unset_value(const Eldbus_Service_Interface *iface, const Eldbus_Message 
      }
 
    DBG("section: '%s', name: '%s'", section, name);
+
+   wkb_ibus_config_eet_set_value(_conf_eet, section, name, NULL);
 
    return NULL;
 }
@@ -163,8 +185,40 @@ static const Eldbus_Service_Interface_Desc _wkb_ibus_config_interface =
 };
 
 Eldbus_Service_Interface *
-wkb_ibus_config_register(Eldbus_Connection *conn)
+wkb_ibus_config_register(Eldbus_Connection *conn, const char *path)
 {
-   return eldbus_service_interface_register(conn, IBUS_PATH_CONFIG, &_wkb_ibus_config_interface);
+   Eldbus_Service_Interface *ret = NULL;
+
+   if (_conf_eet)
+     {
+        WRN("wkb_config_eet already created\n");
+        goto end;
+     }
+
+   if (!(ret = eldbus_service_interface_register(conn, IBUS_PATH_CONFIG, &_wkb_ibus_config_interface)))
+     {
+        ERR("Unable to register IBusConfig interface\n");
+        goto end;
+     }
+
+   _conf_eet = wkb_ibus_config_eet_new(path, ret);
+
+   if (!_conf_eet)
+     {
+        eldbus_service_interface_unregister(ret);
+        ret = NULL;
+     }
+
+end:
+   return ret;
 }
 
+void
+wkb_ibus_config_unregister(void)
+{
+   if (!_conf_eet)
+      return;
+
+   wkb_ibus_config_eet_free(_conf_eet);
+   _conf_eet = NULL;
+}

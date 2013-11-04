@@ -20,15 +20,26 @@
 #include <Eina.h>
 #include <Eldbus.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct wkb_ibus_config_eet;
 
 Eina_Bool wkb_ibus_config_eet_set_value(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name, Eldbus_Message_Iter *value);
-void *wkb_ibus_config_eet_get_value(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name);
-void *wkb_ibus_config_eet_get_values(struct wkb_ibus_config_eet *config_eet, const char *section);
+Eina_Bool wkb_ibus_config_eet_get_value(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name, Eldbus_Message_Iter *reply);
+Eina_Bool wkb_ibus_config_eet_get_values(struct wkb_ibus_config_eet *config_eet, const char *section, Eldbus_Message_Iter *reply);
 
 void wkb_ibus_config_eet_set_defaults(struct wkb_ibus_config_eet *config_eet);
 
-struct wkb_ibus_config_eet *wkb_ibus_config_eet_new(const char *path);
+struct wkb_ibus_config_eet *wkb_ibus_config_eet_new(const char *path, Eldbus_Service_Interface *iface);
 void wkb_ibus_config_eet_free(struct wkb_ibus_config_eet *config_eet);
+
+int wkb_ibus_config_eet_init(void);
+void wkb_ibus_config_eet_shutdown(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* _WKB_IBUS_CONFIG_EET_H_ */
