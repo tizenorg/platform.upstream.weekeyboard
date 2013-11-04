@@ -1,3 +1,57 @@
+* Mon Nov 04 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> upstream/0.0.2@978eca4
+- Update packaging for version 0.0.2
+- Updated package revision
+- Added Tizen packaging
+- Imported Upstream version 0.0.2
+- Merge branch 'master' into upstream
+- Release 0.0.2
+- Rework key handling
+- Fix handling of special keys
+- Enable IBus integration
+- Check for IBus GlobalEngine property
+- Finish implementation of IBusInputContext
+- Fix deserialize for all IBus types
+- New IBus helper functions
+- Fix IBus shutdown process
+- Added proxy calls to IBusInputContext service
+- Fix ibus-test to match new wkb-ibus connection scheme
+- Attempt to reconnect to IBus daemon when connection is lost
+- Nullify reference to config_eet in unregister
+- Rename global struct to avoid confusion
+- New dedicated file for various IBus helper functions
+- Fix query for IBus address
+- Add events to notify of IBus connect/disconnect
+- Fix engine/hangul config key names
+- Receive path as parameter in config_register
+- Add missing extern "C" directives in header files
+- Fix init/shutdown process in wkb-ibus and wkb-ibus-test
+- Make use of Eina_Log for debugging messages
+- Fix handling of backspace key press
+- Don't hardcode config file path
+- Emit 'ValueChanged' signal upon change
+- Write modifications to Eet file upon change
+- Fix handling of "Enter" key press
+- Handle cases of Eldbus_Message_Iter argument being NULL
+- Enable use of IBusConfig interface
+- Fix section/key search
+- Fix implementation of wkb_ibus_config_eet_get_values()
+- The return value of config_key_get must be a variant
+- New function wkb_config_key_signature()
+- Add implementation of string_list_key_get()
+- Fix signatures of wkb_ibus_config_eet public functions
+- Fix signature of wkb_config_key_get
+- Cosmetic change for DBus message error checking macros
+- Move IBus definitions to a dedicated header file
+- Added wkb_ibus_config_unregister
+- Fix initializations in tests
+- Added missing implementation of config_key_string_list_set
+- Add config_section_get_value and config_section_set_value
+- Fix config_section initialization order
+- Add accessor for key id
+- Introduce struct _config_key
+- Improve config_section base implementation
+- Make use of -Wno-unused-parameter
+
 * Wed Sep 18 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> upstream/0.0.1@d5a9506
 - Updated package revision
 
