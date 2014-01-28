@@ -1,4 +1,5 @@
 %bcond_with mobile
+%bcond_with wayland
 
 Name:           weekeyboard
 Version:        0.0.2
@@ -26,6 +27,10 @@ BuildRequires:  ibus
 Requires:       ibus
 Requires:       ibus-hangul
 Requires:       ibus-libpinyin
+%endif
+
+%if !%{with wayland}
+ExclusiveArch:
 %endif
 
 %description
