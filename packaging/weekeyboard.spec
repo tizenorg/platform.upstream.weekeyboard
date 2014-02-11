@@ -1,3 +1,5 @@
+%bcond_with wayland
+
 Name:           weekeyboard
 Version:        0.0.2
 Release:        1
@@ -24,6 +26,9 @@ Requires:       ibus
 Requires:       ibus-hangul
 Requires:       ibus-libpinyin
 
+%if !%{with wayland}
+ExclusiveArch:
+%endif
 
 %description
 Weekeyboard is virtual keyboard application written in EFL and
