@@ -1,6 +1,4 @@
-%bcond_with mobile
 %bcond_with wayland
-
 Name:           weekeyboard
 Version:        0.0.2
 Release:        1
@@ -21,13 +19,12 @@ BuildRequires:  pkgconfig(edje)
 BuildRequires:  pkgconfig(eet)
 BuildRequires:  pkgconfig(efreet)
 BuildRequires:  pkgconfig(eldbus)
-%if !%{with mobile}
 BuildRequires:  ibus
 
 Requires:       ibus
 Requires:       ibus-hangul
 Requires:       ibus-libpinyin
-%endif
+
 
 %if !%{with wayland}
 ExclusiveArch:
