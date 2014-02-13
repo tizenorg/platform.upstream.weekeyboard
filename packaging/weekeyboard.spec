@@ -39,7 +39,7 @@ cp %{SOURCE1001} .
 
 %build
 
-%configure --disable-ibus
+%reconfigure --disable-ibus
 make %{?_smp_mflags}
 
 %install
