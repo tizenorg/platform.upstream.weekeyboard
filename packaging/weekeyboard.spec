@@ -2,7 +2,7 @@
 
 Name:           weekeyboard
 Version:        0.0.2
-Release:        1
+Release:        0
 License:        Apache-2.0
 Summary:        Virtual Keyboard Application
 Url:            http://github.com/etrunko/weekeyboard
@@ -15,7 +15,6 @@ BuildRequires:  pkgconfig(eet)
 BuildRequires:  pkgconfig(evas)
 BuildRequires:  pkgconfig(ecore)
 BuildRequires:  pkgconfig(ecore-evas)
-BuildRequires:  pkgconfig(ecore-wayland)
 BuildRequires:  pkgconfig(edje)
 BuildRequires:  pkgconfig(eet)
 BuildRequires:  pkgconfig(efreet)
@@ -26,7 +25,9 @@ Requires:       ibus
 Requires:       ibus-hangul
 Requires:       ibus-libpinyin
 
-%if !%{with wayland}
+%if %{with wayland}
+BuildRequires:  pkgconfig(ecore-wayland)
+%else
 ExclusiveArch:
 %endif
 
@@ -51,6 +52,4 @@ make %{?_smp_mflags}
 %license COPYING
 %{_bindir}/weekeyboard
 %{_datadir}/weekeyboard/*.edj
-
-%changelog
 
