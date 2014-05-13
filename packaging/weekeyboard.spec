@@ -32,7 +32,7 @@ ExclusiveArch:
 %endif
 
 %description
-Weekeyboard is virtual keyboard application written in EFL and
+Weekeyboard is a virtual keyboard application written in EFL and
 made for Wayland compositors.
 %prep
 %setup -q
