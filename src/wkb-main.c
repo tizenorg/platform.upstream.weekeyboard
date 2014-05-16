@@ -437,9 +437,19 @@ _wkb_ui_setup(struct weekeyboard *wkb)
    if (wkb->win)
      {
         int x, y, w, h;
+        struct wl_region *input;
 
         edje_object_part_geometry_get(wkb->edje_obj, "background", &x, &y, &w, &h);
+
+#if (EFL_VERSION_MAJOR == 1) && (EFL_VERSION_MINOR >= 8)
         ecore_wl_window_input_region_set(wkb->win, x, y, w, h);
+#else
+        input = wl_compositor_create_region(wkb->win->display->wl.compositor);
+
+        wl_region_add(input, x, y, w, h);
+        wl_surface_set_input_region(wkb->surface, input);
+        wl_region_destroy(input);
+#endif
      }
 
    /* special keys */
@@ -462,7 +472,11 @@ end:
 static void
 _wkb_setup(struct weekeyboard *wkb)
 {
+#if (EFL_VERSION_MAJOR == 1) && (EFL_VERSION_MINOR >= 8)
    Eina_Inlist *globals;
+#else
+   struct wl_list *globals;
+#endif
    struct wl_registry *registry;
    Ecore_Wl_Global *global;
 
@@ -470,7 +484,13 @@ _wkb_setup(struct weekeyboard *wkb)
 
    globals = ecore_wl_globals_get();
    registry = ecore_wl_registry_get();
+
+#if (EFL_VERSION_MAJOR == 1) && (EFL_VERSION_MINOR >= 8)
    EINA_INLIST_FOREACH(globals, global)
+#else
+   wl_list_for_each(global, globals, link)
+#endif
+
      {
         if (strcmp(global->interface, "wl_input_panel") == 0)
            wkb->ip = wl_registry_bind(registry, global->id, &wl_input_panel_interface, 1);
