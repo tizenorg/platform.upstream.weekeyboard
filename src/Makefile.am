@@ -32,10 +32,10 @@ weekeyboard_SOURCES=				\
 	text-protocol.c				\
 	text-client-protocol.h
 
-
 noinst_PROGRAMS =				\
 	weekeyboard-config-eet-test		\
-	weekeyboard-ibus-test
+	weekeyboard-ibus-test                   \
+        weekeyboard-config-client
 
 weekeyboard_config_eet_test_SOURCES =		\
 	wkb-log.c				\
@@ -62,6 +62,12 @@ weekeyboard_ibus_test_SOURCES =			\
 	wkb-ibus-config-eet.c			\
 	wkb-ibus-config-eet.h			\
 	wkb-ibus-test.c
+
+weekeyboard_config_client_SOURCES =             \
+	wkb-log.c				\
+	wkb-log.h				\
+	wkb-ibus-defs.h				\
+        wkb-config-client.c
 
 @wayland_scanner_rules@
 
