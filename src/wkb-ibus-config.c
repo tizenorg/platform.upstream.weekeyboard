@@ -21,6 +21,8 @@
 #include <Eina.h>
 #include <Eldbus.h>
 
+#include "wkb-ibus-config.h"
+
 #include "wkb-ibus.h"
 #include "wkb-ibus-defs.h"
 #include "wkb-ibus-config-eet.h"
@@ -28,23 +30,46 @@
 
 static struct wkb_ibus_config_eet *_conf_eet = NULL;
 
-#define _config_check_message_errors(_msg) \
-   do \
-     { \
-        const char *error, *error_msg; \
-        if (eldbus_message_error_get(_msg, &error, &error_msg)) \
-          { \
-             ERR("DBus message error: %s: %s", error, error_msg); \
-             return NULL; \
-          } \
-        DBG("Message '%s' with signature '%s'", eldbus_message_member_get(_msg), eldbus_message_signature_get(_msg)); \
-     } while (0)
+#define _config_check_message_errors(_msg)				\
+   do									\
+{									\
+   const char *error, *error_msg;					\
+   if (eldbus_message_error_get(_msg, &error, &error_msg))		\
+     {								\
+        ERR("DBus message error: %s: %s", error, error_msg);		\
+        return NULL;							\
+     }								\
+   DBG("Message '%s' with signature '%s'", eldbus_message_member_get(_msg), eldbus_message_signature_get(_msg)); \
+} while (0)
+
+
+int
+wkb_ibus_config_get_value_int(const char* section, const char* name)
+{
+   DBG("wkb_ibus_config_get_value_int _conf_eet = 0x%p", _conf_eet);
+
+   if (! _conf_eet) return -1;
+
+   return wkb_ibus_config_eet_get_value_int(_conf_eet, section, name);
+}
+
+const char*
+wkb_ibus_config_get_value_string(const char* section, const char* name)
+{
+   DBG("wkb_ibus_config_get_value_int _conf_eet = 0x%p", _conf_eet);
+
+   if (! _conf_eet) return "default";
+
+   return wkb_ibus_config_eet_get_value_string(_conf_eet, section, name);
+}
 
 static Eldbus_Message *
 _config_set_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *msg)
 {
    const char *section, *name;
    Eldbus_Message_Iter *value;
+
+   DBG("in _config_set_value");
 
    _config_check_message_errors(msg);
 
@@ -129,52 +154,53 @@ _config_unset_value(const Eldbus_Service_Interface *iface, const Eldbus_Message 
    return NULL;
 }
 
+
 static const Eldbus_Method _wkb_ibus_config_methods[] =
 {
-/* typedef struct _Eldbus_Method
- * {
- *    const char *member;
- *    const Eldbus_Arg_Info *in;
- *    const Eldbus_Arg_Info *out;
- *    Eldbus_Method_Cb cb;
- *    unsigned int flags;
- * } Eldbus_Method;
- */
-   { .member = "SetValue",
-     .in = ELDBUS_ARGS({"s", "section"}, {"s", "name"}, {"v", "value"}),
-     .cb = _config_set_value, },
+   /* typedef struct _Eldbus_Method
+    * {
+    *    const char *member;
+    *    const Eldbus_Arg_Info *in;
+    *    const Eldbus_Arg_Info *out;
+    *    Eldbus_Method_Cb cb;
+    *    unsigned int flags;
+    * } Eldbus_Method;
+    */
+     { .member = "SetValue",
+        .in = ELDBUS_ARGS({"s", "section"}, {"s", "name"}, {"v", "value"}),
+        .cb = _config_set_value, },
 
-   { .member = "GetValue",
-     .in = ELDBUS_ARGS({"s", "section"}, {"s", "name"}),
-     .out = ELDBUS_ARGS({"v", "value"}),
-     .cb = _config_get_value, },
+     { .member = "GetValue",
+        .in = ELDBUS_ARGS({"s", "section"}, {"s", "name"}),
+        .out = ELDBUS_ARGS({"v", "value"}),
+        .cb = _config_get_value, },
 
-   { .member = "GetValues",
-     .in = ELDBUS_ARGS({"s", "section"}),
-     .out = ELDBUS_ARGS({"a{sv}", "values"}),
-     .cb = _config_get_values, },
+     { .member = "GetValues",
+        .in = ELDBUS_ARGS({"s", "section"}),
+        .out = ELDBUS_ARGS({"a{sv}", "values"}),
+        .cb = _config_get_values, },
 
-   { .member = "UnsetValue",
-     .in = ELDBUS_ARGS({"s", "section"}, {"s", "name"}),
-     .cb = _config_unset_value, },
+     { .member = "UnsetValue",
+        .in = ELDBUS_ARGS({"s", "section"}, {"s", "name"}),
+        .cb = _config_unset_value, },
 
-   { NULL },
+     { NULL },
 };
 
 static const Eldbus_Signal _wkb_ibus_config_signals[] =
 {
-/* typedef struct _Eldbus_Signal
- * {
- *    const char *name;
- *    const Eldbus_Arg_Info *args;
- *    unsigned int flags;
- * } Eldbus_Signal;
- */
-   { .name = "ValueChanged",
-     .args = ELDBUS_ARGS({"s", "section"}, {"s", "name"}, {"v", "value"}),
-     .flags = 0, },
+   /* typedef struct _Eldbus_Signal
+    * {
+    *    const char *name;
+    *    const Eldbus_Arg_Info *args;
+    *    unsigned int flags;
+    * } Eldbus_Signal;
+    */
+     { .name = "ValueChanged",
+        .args = ELDBUS_ARGS({"s", "section"}, {"s", "name"}, {"v", "value"}),
+        .flags = 0, },
 
-   { NULL },
+     { NULL },
 };
 
 static const Eldbus_Service_Interface_Desc _wkb_ibus_config_interface =
@@ -195,6 +221,7 @@ wkb_ibus_config_register(Eldbus_Connection *conn, const char *path)
         goto end;
      }
 
+   DBG("eldbus_service_interface_register");
    if (!(ret = eldbus_service_interface_register(conn, IBUS_PATH_CONFIG, &_wkb_ibus_config_interface)))
      {
         ERR("Unable to register IBusConfig interface\n");

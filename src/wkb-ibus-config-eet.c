@@ -134,9 +134,9 @@ end:
         if (parent) \
           { \
              if (parent->id) \
-                _section->id = eina_stringshare_printf("%s/" #_id, parent->id); \
+             _section->id = eina_stringshare_printf("%s/" #_id, parent->id); \
              else \
-                _section->id = eina_stringshare_add(#_id); \
+             _section->id = eina_stringshare_add(#_id); \
              parent->subsections = eina_list_append(parent->subsections, _section); \
           } \
    } while (0)
@@ -149,16 +149,16 @@ end:
    } while (0)
 
 #define _config_section_add_key_int(_section, _section_id, _field) \
-    _config_section_add_key(_section, _section_id, int, _field)
+   _config_section_add_key(_section, _section_id, int, _field)
 
 #define _config_section_add_key_bool(_section, _section_id, _field) \
-    _config_section_add_key(_section, _section_id, bool, _field)
+   _config_section_add_key(_section, _section_id, bool, _field)
 
 #define _config_section_add_key_string(_section, _section_id, _field) \
-    _config_section_add_key(_section, _section_id, string, _field)
+   _config_section_add_key(_section, _section_id, string, _field)
 
 #define _config_section_add_key_string_list(_section, _section_id, _field) \
-    _config_section_add_key(_section, _section_id, string_list, _field)
+   _config_section_add_key(_section, _section_id, string_list, _field)
 
 /*
  * Helpers
@@ -365,6 +365,11 @@ _config_hotkey_new(struct _config_section *parent)
  *      <summary>DConf preserve name prefixes</summary>
  *      <description>Prefixes of DConf keys to stop name conversion</description>
  *    </key>
+ *    <key type="s" name="theme">
+ *      <default>default</default>
+ *      <summary>Path to theme .edj file.</summary>
+ *      <description>Path to theme .edj file. This describes the appearance and size of the keyboard.</description>
+ *    </key>
  *    <child schema="org.freedesktop.ibus.general.hotkey" name="hotkey"/>
  * </schema>
  */
@@ -386,6 +391,8 @@ struct _config_general
    Eina_Bool embed_preedit_text;
    Eina_Bool use_global_engine;
    Eina_Bool enable_by_default;
+
+   const char* theme;
 };
 
 static Eet_Data_Descriptor *
@@ -407,6 +414,7 @@ _config_general_edd_new(Eet_Data_Descriptor *hotkey_edd)
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_general, "enable-by-default", enable_by_default, EET_T_UCHAR);
    EET_DATA_DESCRIPTOR_ADD_LIST_STRING(edd, struct _config_general, "dconf-preserve-name-prefixes", dconf_preserve_name_prefixes);
    EET_DATA_DESCRIPTOR_ADD_SUB(edd, struct _config_general, "hotkey", hotkey, hotkey_edd);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_general, "theme", theme, EET_T_STRING);
 
    return edd;
 }
@@ -429,6 +437,7 @@ _config_general_set_defaults(struct _config_section *base)
    general->use_global_engine = EINA_FALSE;
    general->enable_by_default = EINA_FALSE;
    general->dconf_preserve_name_prefixes = _config_string_list_new(dconf_preserve_name_prefixes);
+   general->theme = eina_stringshare_add("default");
 }
 
 static void
@@ -446,6 +455,9 @@ _config_general_section_init(struct _config_section *base, struct _config_sectio
    _config_section_add_key_bool(base, general, use_global_engine);
    _config_section_add_key_bool(base, general, enable_by_default);
    _config_section_add_key_string_list(base, general, dconf_preserve_name_prefixes);
+   _config_section_add_key_string(base, general, theme);
+
+   _config_section_set_defaults(base);
 
    if (conf->hotkey)
       _config_hotkey_section_init(conf->hotkey, base);
@@ -835,6 +847,45 @@ wkb_ibus_config_eet_get_value(struct wkb_ibus_config_eet *config_eet, const char
 
 end:
    return ret;
+}
+
+int
+wkb_ibus_config_eet_get_value_int(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   Eina_Bool ret = EINA_FALSE;
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        goto end;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_int(key);
+
+end:
+   return NULL;
+}
+const char*
+wkb_ibus_config_eet_get_value_string(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   Eina_Bool ret = EINA_FALSE;
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        goto end;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_string(key);
+
+end:
+   return NULL;
 }
 
 Eina_Bool
