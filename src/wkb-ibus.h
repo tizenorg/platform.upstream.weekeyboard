@@ -53,6 +53,11 @@ Eldbus_Service_Interface * wkb_ibus_panel_register(Eldbus_Connection *conn);
 Eldbus_Service_Interface * wkb_ibus_config_register(Eldbus_Connection *conn, const char *path);
 void wkb_ibus_config_unregister(void);
 
+const char* wkb_ibus_get_theme();
+
+typedef void (*wkb_theme_changed_cb)(const char* path, void* data);
+void wkb_ibus_theme_changes(wkb_theme_changed_cb cb, void* data);
+
 #ifdef __cplusplus
 }
 #endif
