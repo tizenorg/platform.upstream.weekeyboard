@@ -509,6 +509,7 @@ struct _config_panel
    struct _config_section base;
 
    const char *custom_font;
+   const char *theme;
    int show;
    int x;
    int y;
@@ -535,6 +536,7 @@ _config_panel_edd_new(void)
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "show-im-name", show_im_name, EET_T_UCHAR);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "use-custom-font", use_custom_font, EET_T_UCHAR);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "custom-font", custom_font, EET_T_STRING);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "theme", theme, EET_T_STRING);
 
    return edd;
 }
@@ -552,6 +554,7 @@ _config_panel_set_defaults(struct _config_section *base)
    panel->show_im_name = EINA_FALSE;
    panel->use_custom_font = EINA_FALSE;
    panel->custom_font = eina_stringshare_add("Sans 10");
+   panel->theme = eina_stringshare_add("default");
 }
 
 static void
@@ -566,6 +569,7 @@ _config_panel_section_init(struct _config_section *base, struct _config_section 
    _config_section_add_key_bool(base, panel, show_im_name);
    _config_section_add_key_bool(base, panel, use_custom_font);
    _config_section_add_key_string(base, panel, custom_font);
+   _config_section_add_key_string(base, panel, theme);
 }
 
 static struct _config_section *
