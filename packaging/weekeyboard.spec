@@ -19,6 +19,7 @@ BuildRequires:  pkgconfig(edje)
 BuildRequires:  pkgconfig(eet)
 BuildRequires:  pkgconfig(efreet)
 BuildRequires:  pkgconfig(eldbus)
+BuildRequires:  pkgconfig
 BuildRequires:  ibus
 
 Requires:       ibus
@@ -34,6 +35,7 @@ ExclusiveArch:
 %description
 Weekeyboard is a virtual keyboard application written in EFL and
 made for Wayland compositors.
+
 %prep
 %setup -q
 cp %{SOURCE1001} .
@@ -41,7 +43,7 @@ cp %{SOURCE1001} .
 %build
 
 %reconfigure --disable-ibus
-make %{?_smp_mflags}
+%__make %{?_smp_mflags}
 
 %install
 %make_install
@@ -52,4 +54,3 @@ make %{?_smp_mflags}
 %license COPYING
 %{_bindir}/weekeyboard
 %{_datadir}/weekeyboard/*.edj
-
