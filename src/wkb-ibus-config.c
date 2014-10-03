@@ -21,6 +21,8 @@
 #include <Eina.h>
 #include <Eldbus.h>
 
+#include "wkb-ibus-config.h"
+
 #include "wkb-ibus.h"
 #include "wkb-ibus-defs.h"
 #include "wkb-ibus-config-eet.h"
@@ -40,11 +42,35 @@ static struct wkb_ibus_config_eet *_conf_eet = NULL;
         DBG("Message '%s' with signature '%s'", eldbus_message_member_get(_msg), eldbus_message_signature_get(_msg)); \
      } while (0)
 
+int
+wkb_ibus_config_get_value_int(const char *section, const char *name)
+{
+   DBG("wkb_ibus_config_get_value_int _conf_eet = 0x%p", _conf_eet);
+
+   if (!_conf_eet)
+      return -1;
+
+   return wkb_ibus_config_eet_get_value_int(_conf_eet, section, name);
+}
+
+const char *
+wkb_ibus_config_get_value_string(const char *section, const char *name)
+{
+   DBG("wkb_ibus_config_get_value_int _conf_eet = 0x%p", _conf_eet);
+
+   if (!_conf_eet)
+      return "default";
+
+   return wkb_ibus_config_eet_get_value_string(_conf_eet, section, name);
+}
+
 static Eldbus_Message *
 _config_set_value(const Eldbus_Service_Interface *iface, const Eldbus_Message *msg)
 {
    const char *section, *name;
    Eldbus_Message_Iter *value;
+
+   DBG("in _config_set_value");
 
    _config_check_message_errors(msg);
 

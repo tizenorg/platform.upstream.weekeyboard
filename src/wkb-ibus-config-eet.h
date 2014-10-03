@@ -38,6 +38,8 @@ void wkb_ibus_config_eet_free(struct wkb_ibus_config_eet *config_eet);
 int wkb_ibus_config_eet_init(void);
 void wkb_ibus_config_eet_shutdown(void);
 
+int wkb_ibus_config_eet_get_value_int(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name);
+const char *wkb_ibus_config_eet_get_value_string(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name);
 #ifdef __cplusplus
 }
 #endif
