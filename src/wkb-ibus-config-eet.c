@@ -447,6 +447,8 @@ _config_general_section_init(struct _config_section *base, struct _config_sectio
    _config_section_add_key_bool(base, general, enable_by_default);
    _config_section_add_key_string_list(base, general, dconf_preserve_name_prefixes);
 
+   _config_section_set_defaults(base);
+
    if (conf->hotkey)
       _config_hotkey_section_init(conf->hotkey, base);
 }
@@ -502,14 +504,18 @@ _config_general_new(struct _config_section *parent)
  *      <summary>Custom font</summary>
  *      <description>Custom font name for language panel</description>
  *    </key>
- * </schema>
+ *    <key type="s" name="theme">
+ *      <default>default</default>
+ *      <summary>Path to theme .edj file.</summary>
+ *      <description>Path to theme .edj file. This describes the appearance and size of the keyboard.</description>
+ *    </key>
+ *  </schema>
  */
 struct _config_panel
 {
    struct _config_section base;
 
    const char *custom_font;
-   const char *theme;
    int show;
    int x;
    int y;
@@ -517,6 +523,9 @@ struct _config_panel
    Eina_Bool show_icon_in_systray;
    Eina_Bool show_im_name;
    Eina_Bool use_custom_font;
+
+    // name of the install theme
+   const char *theme;
 };
 
 static Eet_Data_Descriptor *
@@ -839,6 +848,66 @@ wkb_ibus_config_eet_get_value(struct wkb_ibus_config_eet *config_eet, const char
 
 end:
    return ret;
+}
+
+int
+wkb_ibus_config_eet_get_value_int(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   Eina_Bool ret = EINA_FALSE;
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        goto end;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_int(key);
+
+end:
+   return -1;
+}
+
+Eina_Bool
+wkb_ibus_config_eet_get_value_bool(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   Eina_Bool ret = EINA_FALSE;
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        goto end;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_bool(key);
+
+end:
+   return EINA_FALSE;
+}
+
+const char *
+wkb_ibus_config_eet_get_value_string(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   Eina_Bool ret = EINA_FALSE;
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        goto end;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_string(key);
+
+end:
+   return NULL;
 }
 
 Eina_Bool
