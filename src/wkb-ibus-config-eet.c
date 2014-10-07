@@ -447,6 +447,8 @@ _config_general_section_init(struct _config_section *base, struct _config_sectio
    _config_section_add_key_bool(base, general, enable_by_default);
    _config_section_add_key_string_list(base, general, dconf_preserve_name_prefixes);
 
+   _config_section_set_defaults(base);
+
    if (conf->hotkey)
       _config_hotkey_section_init(conf->hotkey, base);
 }
@@ -502,7 +504,12 @@ _config_general_new(struct _config_section *parent)
  *      <summary>Custom font</summary>
  *      <description>Custom font name for language panel</description>
  *    </key>
- * </schema>
+ *    <key type="s" name="theme">
+ *      <default>default</default>
+ *      <summary>Path to theme .edj file.</summary>
+ *      <description>Path to theme .edj file. This describes the appearance and size of the keyboard.</description>
+ *    </key>
+ *  </schema>
  */
 struct _config_panel
 {
@@ -528,6 +535,8 @@ _config_panel_edd_new(void)
    EET_EINA_STREAM_DATA_DESCRIPTOR_CLASS_SET(&eddc, struct _config_panel);
    edd = eet_data_descriptor_stream_new(&eddc);
 
+   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "custom-font", custom_font, EET_T_STRING);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "theme", theme, EET_T_STRING);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "show", show, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "x", x, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "y", y, EET_T_INT);
@@ -535,8 +544,6 @@ _config_panel_edd_new(void)
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "show-icon-in-systray", show_icon_in_systray, EET_T_UCHAR);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "show-im-name", show_im_name, EET_T_UCHAR);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "use-custom-font", use_custom_font, EET_T_UCHAR);
-   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "custom-font", custom_font, EET_T_STRING);
-   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "theme", theme, EET_T_STRING);
 
    return edd;
 }
@@ -546,6 +553,8 @@ _config_panel_set_defaults(struct _config_section *base)
 {
    struct _config_panel *panel = (struct _config_panel *) base;
 
+   panel->custom_font = eina_stringshare_add("Sans 10");
+   panel->theme = eina_stringshare_add("default");
    panel->show = 0;
    panel->x = -1;
    panel->y = -1;
@@ -553,14 +562,14 @@ _config_panel_set_defaults(struct _config_section *base)
    panel->show_icon_in_systray = EINA_TRUE;
    panel->show_im_name = EINA_FALSE;
    panel->use_custom_font = EINA_FALSE;
-   panel->custom_font = eina_stringshare_add("Sans 10");
-   panel->theme = eina_stringshare_add("default");
 }
 
 static void
 _config_panel_section_init(struct _config_section *base, struct _config_section *parent)
 {
    _config_section_init(base, panel);
+   _config_section_add_key_string(base, panel, custom_font);
+   _config_section_add_key_string(base, panel, theme);
    _config_section_add_key_int(base, panel, show);
    _config_section_add_key_int(base, panel, x);
    _config_section_add_key_int(base, panel, y);
@@ -568,8 +577,8 @@ _config_panel_section_init(struct _config_section *base, struct _config_section 
    _config_section_add_key_bool(base, panel, show_icon_in_systray);
    _config_section_add_key_bool(base, panel, show_im_name);
    _config_section_add_key_bool(base, panel, use_custom_font);
-   _config_section_add_key_string(base, panel, custom_font);
-   _config_section_add_key_string(base, panel, theme);
+
+   _config_panel_set_defaults(base);
 }
 
 static struct _config_section *
@@ -826,6 +835,52 @@ end:
 Eina_Bool
 wkb_ibus_config_eet_get_value(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name, Eldbus_Message_Iter *reply)
 {
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        return EINA_FALSE;
+     }
+
+   return wkb_config_key_get(key, reply);
+}
+
+int
+wkb_ibus_config_eet_get_value_int(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        return -1;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_int(key);
+}
+
+Eina_Bool
+wkb_ibus_config_eet_get_value_bool(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
+   struct wkb_config_key *key;
+
+   if (!(key = _config_section_find_key(config_eet->ibus_config, section, name)))
+     {
+        ERR("Config key with id '%s' not found", name);
+        return EINA_FALSE;
+     }
+
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_bool(key);
+}
+
+const char *
+wkb_ibus_config_eet_get_value_string(struct wkb_ibus_config_eet *config_eet, const char *section, const char *name)
+{
    Eina_Bool ret = EINA_FALSE;
    struct wkb_config_key *key;
 
@@ -835,10 +890,12 @@ wkb_ibus_config_eet_get_value(struct wkb_ibus_config_eet *config_eet, const char
         goto end;
      }
 
-   ret = wkb_config_key_get(key, reply);
+   DBG("Found key: section = <%s> name = <%s>", section, name);
+
+   return wkb_config_key_get_string(key);
 
 end:
-   return ret;
+   return NULL;
 }
 
 Eina_Bool
