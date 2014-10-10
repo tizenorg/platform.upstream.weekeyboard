@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 
 #include "wkb-ibus-config-key.h"
 #include "wkb-log.h"
@@ -116,6 +117,7 @@ _key_string_set(struct wkb_config_key *key, Eldbus_Message_Iter *iter)
         ERR("Error decoding string value using 's'");
         return EINA_FALSE;
      }
+   DBG("Setting key <%s> to <%s>", key->id, str);
 
    if ((field = (const char **) key->field))
       _key_string_free(field);
@@ -207,6 +209,33 @@ struct wkb_config_key *
 wkb_config_key_string_list(const char *id, void *field)
 {
    return _key_new(id, "as", field, (key_free_cb) _key_string_list_free, _key_string_list_set, _key_string_list_get);
+}
+
+int
+wkb_config_key_get_int(struct wkb_config_key* key)
+{
+   assert(!strcmp(key->signature, "i"));
+
+   return *((int *) key->field);
+}
+
+Eina_Bool
+wkb_config_key_get_bool(struct wkb_config_key* key)
+{
+   assert(!strcmp(key->signature, "b"));
+
+   return *((Eina_Bool *) key->field);
+}
+
+const char *
+wkb_config_key_get_string(struct wkb_config_key* key)
+{
+   DBG("Found key: id = <%s> signature = <%s> field = 0x%p", key->id, key->signature, key->field);
+   DBG("Found key: id = <%s> signature = <%s> field as string = <%s>", key->id, key->signature, *(const char**)key->field);
+
+   assert(!strcmp(key->signature, "s"));
+
+   return *((const char **) key->field);
 }
 
 void
