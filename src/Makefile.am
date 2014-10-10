@@ -1,18 +1,18 @@
 bin_PROGRAMS =					\
 	weekeyboard
 
-AM_CFLAGS=					\
+AM_CFLAGS =					\
 	@WAYLAND_CFLAGS@			\
 	@EFL_CFLAGS@				\
 	@IBUS_CFLAGS@				\
 	-DPKGDATADIR='"$(pkgdatadir)"'
 
-AM_LDFLAGS=					\
+AM_LDFLAGS =					\
 	@WAYLAND_LIBS@				\
 	@EFL_LIBS@				\
 	@IBUS_LIBS@
 
-weekeyboard_SOURCES=				\
+weekeyboard_SOURCES =				\
 	wkb-main.c				\
 	wkb-log.c				\
 	wkb-log.h				\
@@ -23,6 +23,7 @@ weekeyboard_SOURCES=				\
 	wkb-ibus-defs.h				\
 	wkb-ibus-panel.c			\
 	wkb-ibus-config.c			\
+	wkb-ibus-config.h			\
 	wkb-ibus-config-key.c			\
 	wkb-ibus-config-key.h			\
 	wkb-ibus-config-eet.c			\
@@ -32,10 +33,10 @@ weekeyboard_SOURCES=				\
 	text-protocol.c				\
 	text-client-protocol.h
 
-
 noinst_PROGRAMS =				\
 	weekeyboard-config-eet-test		\
-	weekeyboard-ibus-test
+	weekeyboard-ibus-test			\
+	weekeyboard-config-client
 
 weekeyboard_config_eet_test_SOURCES =		\
 	wkb-log.c				\
@@ -45,7 +46,6 @@ weekeyboard_config_eet_test_SOURCES =		\
 	wkb-ibus-config-eet.c			\
 	wkb-ibus-config-eet.h			\
 	wkb-ibus-config-eet-test.c
-
 
 weekeyboard_ibus_test_SOURCES =			\
 	wkb-ibus.h				\
@@ -63,9 +63,15 @@ weekeyboard_ibus_test_SOURCES =			\
 	wkb-ibus-config-eet.h			\
 	wkb-ibus-test.c
 
+weekeyboard_config_client_SOURCES =		\
+	wkb-log.c				\
+	wkb-log.h				\
+	wkb-ibus-defs.h				\
+	wkb-config-client.c
+
 @wayland_scanner_rules@
 
-BUILT_SOURCES=					\
+BUILT_SOURCES =					\
 	 input-method-protocol.c		\
 	 input-method-client-protocol.h		\
 	 text-protocol.c			\
