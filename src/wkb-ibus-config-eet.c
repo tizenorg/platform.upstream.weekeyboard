@@ -504,6 +504,11 @@ _config_general_new(struct _config_section *parent)
  *      <summary>Custom font</summary>
  *      <description>Custom font name for language panel</description>
  *    </key>
+ *    <key type="s" name="theme">
+ *      <default>default</default>
+ *      <summary>Path to theme .edj file.</summary>
+ *      <description>Path to theme .edj file. This describes the appearance and size of the keyboard.</description>
+ *    </key>
  *  </schema>
  */
 struct _config_panel
@@ -511,6 +516,7 @@ struct _config_panel
    struct _config_section base;
 
    const char *custom_font;
+   const char *theme;
    int show;
    int x;
    int y;
@@ -530,6 +536,7 @@ _config_panel_edd_new(void)
    edd = eet_data_descriptor_stream_new(&eddc);
 
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "custom-font", custom_font, EET_T_STRING);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "theme", theme, EET_T_STRING);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "show", show, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "x", x, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(edd, struct _config_panel, "y", y, EET_T_INT);
@@ -547,6 +554,7 @@ _config_panel_set_defaults(struct _config_section *base)
    struct _config_panel *panel = (struct _config_panel *) base;
 
    panel->custom_font = eina_stringshare_add("Sans 10");
+   panel->theme = eina_stringshare_add("default");
    panel->show = 0;
    panel->x = -1;
    panel->y = -1;
@@ -561,6 +569,7 @@ _config_panel_section_init(struct _config_section *base, struct _config_section 
 {
    _config_section_init(base, panel);
    _config_section_add_key_string(base, panel, custom_font);
+   _config_section_add_key_string(base, panel, theme);
    _config_section_add_key_int(base, panel, show);
    _config_section_add_key_int(base, panel, x);
    _config_section_add_key_int(base, panel, y);
