@@ -250,6 +250,9 @@ _wkb_ibus_query_address(void)
    if (wkb_ibus->address_pending)
       return;
 
+   if (!wkb_ibus->ibus_daemon)
+      return;
+
    INF("Querying IBus address with '%s' command", IBUS_ADDRESS_CMD);
 
    if (!(ibus_exe = ecore_exe_pipe_run(IBUS_ADDRESS_CMD, flags, NULL)))
@@ -411,6 +414,11 @@ wkb_ibus_connect(void)
      {
         INF("IBus address query in progress");
         return EINA_FALSE;
+     }
+
+   if (!wkb_ibus->ibus_daemon)
+     {
+        _wkb_ibus_launch_daemon();
      }
 
    if (!wkb_ibus->address)
