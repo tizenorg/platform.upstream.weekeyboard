@@ -958,75 +958,118 @@ _wkb_ibus_key_from_str(const char *key_str, struct wkb_ibus_key *key)
 #define CASE_LETTER(_low, _up) \
    CASE_KEY_SYM(_low, _up, _up)
 
+   DBG("Key '%s', sym = %d", key_str, key->sym);
+
+   /* UTF8 symbols are multiple-character and won't work
+    * in the case statement */
+#define IF_UTF8(_sym, _code) \
+   if (strcmp(key_str, _sym) == 0)              \
+     {                                          \
+        key->modifiers = 1;                     \
+        key->code = _code;                      \
+        return ;                                \
+     }
+
+#define EIF_UTF8(_sym, _code) \
+   else IF_UTF8(_sym, _code)  \
+
+
    switch(key->sym)
      {
-      CASE_KEY_SYM(grave, asciitilde, GRAVE);
-      CASE_NUMBER(1, exclam);
-      CASE_NUMBER(2, at);
-      CASE_NUMBER(3, numbersign);
-      CASE_NUMBER(4, dollar);
-      CASE_NUMBER(5, percent);
-      CASE_NUMBER(6, asciicircum);
-      CASE_NUMBER(7, ampersand);
-      CASE_NUMBER(8, asterisk);
-      CASE_NUMBER(9, parenleft);
-      CASE_NUMBER(0, parenright);
-      CASE_KEY_SYM(minus, underscore, MINUS);
-      CASE_KEY_SYM(equal, plus, EQUAL);
+        CASE_KEY_SYM(grave, asciitilde, GRAVE);
+        CASE_NUMBER(1, exclam);
+        CASE_NUMBER(2, at);
+        CASE_NUMBER(3, numbersign);
+        CASE_NUMBER(4, dollar);
+        CASE_NUMBER(5, percent);
+        CASE_NUMBER(6, asciicircum);
+        CASE_NUMBER(7, ampersand);
+        CASE_NUMBER(8, asterisk);
+        CASE_NUMBER(9, parenleft);
+        CASE_NUMBER(0, parenright);
+        CASE_KEY_SYM(minus, underscore, MINUS);
+        CASE_KEY_SYM(equal, plus, EQUAL);
 
-      CASE_LETTER(q, Q);
-      CASE_LETTER(w, W);
-      CASE_LETTER(e, E);
-      CASE_LETTER(r, R);
-      CASE_LETTER(t, T);
-      CASE_LETTER(y, Y);
-      CASE_LETTER(u, U);
-      CASE_LETTER(i, I);
-      CASE_LETTER(o, O);
-      CASE_LETTER(p, P);
-      CASE_KEY_SYM(bracketleft, braceleft, LEFTBRACE);
-      CASE_KEY_SYM(bracketright, braceright, RIGHTBRACE);
-      CASE_KEY_SYM(backslash, bar, BACKSLASH);
+        CASE_LETTER(q, Q);
+        CASE_LETTER(w, W);
+        CASE_LETTER(e, E);
+        CASE_LETTER(r, R);
+        CASE_LETTER(t, T);
+        CASE_LETTER(y, Y);
+        CASE_LETTER(u, U);
+        CASE_LETTER(i, I);
+        CASE_LETTER(o, O);
+        CASE_LETTER(p, P);
+        CASE_KEY_SYM(bracketleft, braceleft, LEFTBRACE);
+        CASE_KEY_SYM(bracketright, braceright, RIGHTBRACE);
+        CASE_KEY_SYM(backslash, bar, BACKSLASH);
 
-      CASE_LETTER(a, A);
-      CASE_LETTER(s, S);
-      CASE_LETTER(d, D);
-      CASE_LETTER(f, F);
-      CASE_LETTER(g, G);
-      CASE_LETTER(h, H);
-      CASE_LETTER(j, J);
-      CASE_LETTER(k, K);
-      CASE_LETTER(l, L);
-      CASE_KEY_SYM(semicolon, colon, SEMICOLON);
-      CASE_KEY_SYM(apostrophe, quotedbl, APOSTROPHE);
+        CASE_LETTER(a, A);
+        CASE_LETTER(s, S);
+        CASE_LETTER(d, D);
+        CASE_LETTER(f, F);
+        CASE_LETTER(g, G);
+        CASE_LETTER(h, H);
+        CASE_LETTER(j, J);
+        CASE_LETTER(k, K);
+        CASE_LETTER(l, L);
+        CASE_KEY_SYM(semicolon, colon, SEMICOLON);
+        CASE_KEY_SYM(apostrophe, quotedbl, APOSTROPHE);
 
-      CASE_LETTER(z, Z);
-      CASE_LETTER(x, X);
-      CASE_LETTER(c, C);
-      CASE_LETTER(v, V);
-      CASE_LETTER(b, B);
-      CASE_LETTER(n, N);
-      CASE_LETTER(m, M);
-      CASE_KEY_SYM(comma, less, COMMA);
-      CASE_KEY_SYM(period, greater, DOT);
-      CASE_KEY_SYM(slash, question, SLASH);
-
-#if 0
-      CASE_KEY_SYM(yen, ); /* '¥' */
-      CASE_KEY_SYM(EuroSign, ; /* '€' */
-      CASE_KEY_SYM(WonSign, ); /* '₩' */
-      CASE_KEY_SYM(cent, ); /* '¢' */
-      CASE_KEY_SYM(degree, ); /* '°' */
-      CASE_KEY_SYM(periodcentered, ); /* '˙' */
-      CASE_KEY_SYM(registered, ); /* '®' */
-      CASE_KEY_SYM(copyright, ); /* '©' */
-      CASE_KEY_SYM(questiondown, ); /* '¿' */
-#endif
+        CASE_LETTER(z, Z);
+        CASE_LETTER(x, X);
+        CASE_LETTER(c, C);
+        CASE_LETTER(v, V);
+        CASE_LETTER(b, B);
+        CASE_LETTER(n, N);
+        CASE_LETTER(m, M);
+        CASE_KEY_SYM(comma, less, COMMA);
+        CASE_KEY_SYM(period, greater, DOT);
+        CASE_KEY_SYM(slash, question, SLASH);
 
       default:
-         ERR("Unexpected key '%s'", key_str);
-         key->sym = XKB_KEY_NoSymbol;
-         key->code = KEY_RESERVED;
+        /* There is a problem using a modifier higher than 1. To
+         * work around this, assign all of the special characters
+         * needed to the numeric keypad with a +1 (i.e. shift).
+         *
+         * Below requires this section to be added to the
+         * language file.
+         *
+         *    key <KP0> { [          0,      multiply ] };
+         *    key <KP1> { [          1,      sterling ] };
+         *    key <KP2> { [          2,      division ] };
+         *    key <KP3> { [          3,      registered ] };
+         *    key <KP4> { [          4,      copyright ] };
+         *    key <KP5> { [          5,      cent ] };
+         *    key <KP6> { [          6,      yen ] };
+         *    key <KP7> { [          7,      EuroSign ] };
+         *    key <KP8> { [          8,      questiondown ] };
+         *    key <KP9> { [          9,      exclamdown ] };
+         *
+         *    Add this to a file in /usr/share/X11/xkb/symbols
+         *    (or copy the "wkb" file in data/symbols) and
+         *    specify  the language in weston.ini. E.g. with 
+         *    the "wkb" language file it will be:
+         *
+         *    [keyboard]
+         *    keymap_layout=wkb
+         */
+        IF_UTF8("×", KEY_KP0)
+        EIF_UTF8("£", KEY_KP1)
+        EIF_UTF8("÷", KEY_KP2)
+        EIF_UTF8("®", KEY_KP3)
+        EIF_UTF8("©", KEY_KP4)
+        EIF_UTF8("¢", KEY_KP5)
+        EIF_UTF8("¥", KEY_KP6)
+        EIF_UTF8("€", KEY_KP7)
+        EIF_UTF8("¿", KEY_KP8)
+        EIF_UTF8("¡", KEY_KP9)
+        else
+          {
+             ERR("Unexpected key '%s', sym = %d", key_str, key->sym);
+             key->sym = XKB_KEY_NoSymbol;
+             key->code = KEY_RESERVED;
+          }
      }
 
 #undef CASE_SYM
@@ -1052,7 +1095,7 @@ wkb_ibus_input_context_process_key_event(const char *key_str)
 
    key.code += 8;
 
-   INF("Process key event with '%s'", key_str);
+   INF("Process key event with '%s', code= 0x%x (%d), modifiers = 0x%x", key_str, key.code, key.code, key.modifiers);
 
    /* Key press */
    if (!wkb_ibus->input_ctx->ibus_ctx)
