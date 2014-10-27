@@ -31,8 +31,8 @@ images {
 }
 
 fonts {
-   font: "DroidSans.ttf" "DroidSans";
-   font: "DroidSans-Bold.ttf" "DroidSansBold";
+   font: "SourceSansPro-Regular.otf" "Regular";
+   font: "SourceSansPro-Bold.otf" "Bold";
 }
 
 data {
@@ -262,7 +262,7 @@ collections {
                 _set_key_released(_cur);                               \
              }                                                         \
              set_str(pressed_key, _key);                               \
-             _timer = timer(1.0, "_set_long_press", 1);                \
+             _timer = timer(0.4, "_set_long_press", 1);                \
              set_int(long_press_timer, _timer);                        \
              snprintf(_prg, 30, "key-press-%s", _key);                 \
              run_program(get_program_id(_prg));                        \
@@ -376,7 +376,7 @@ collections {
                  relative: 1.0 0.9;                                    \
               }                                                        \
               text {                                                   \
-                 font: "DroidSans";                                    \
+                 font: "Regular";                                      \
                  size: (40*SCALE);                                     \
                  text: key_low;                                        \
               }                                                        \
@@ -401,7 +401,7 @@ collections {
                  relative: 1.0 0.4;                                    \
               }                                                        \
               text {                                                   \
-                 font: "DroidSans";                                    \
+                 font: "Regular";                                      \
                  size: (20*SCALE);                                     \
                  align: 0.8 0.0;                                       \
                  text: key_alt;                                        \
@@ -458,7 +458,7 @@ collections {
                   relative: 1.0 1.0;                                   \
                }                                                       \
                text {                                                  \
-                  font: "DroidSans";                                   \
+                  font: "Regular";                                     \
                   size: (44*SCALE);                                    \
                   text: key_low;                                       \
                }                                                       \
@@ -579,14 +579,14 @@ collections {
 #define INIT_HSPACE (45*SCALE)
 #define SECOND_ROW FIRST_ROW+KEY_HEIGHT+ROW_SPACE
 
-         KEY_FULL("a", "A", "-", KEY_OFFSET(0), SECOND_ROW)
-         KEY_FULL("s", "S", "@", KEY_OFFSET(1), SECOND_ROW)
-         KEY_FULL("d", "D", "*", KEY_OFFSET(2), SECOND_ROW)
-         KEY_FULL("f", "F", "^", KEY_OFFSET(3), SECOND_ROW)
-         KEY_FULL("g", "G", ":", KEY_OFFSET(4), SECOND_ROW)
-         KEY_FULL("h", "H", ";", KEY_OFFSET(5), SECOND_ROW)
-         KEY_FULL("j", "J", "(", KEY_OFFSET(6), SECOND_ROW)
-         KEY_FULL("k", "K", ")", KEY_OFFSET(7), SECOND_ROW)
+         KEY_FULL("a", "A", "(", KEY_OFFSET(0), SECOND_ROW)
+         KEY_FULL("s", "S", ")", KEY_OFFSET(1), SECOND_ROW)
+         KEY_FULL("d", "D", "-", KEY_OFFSET(2), SECOND_ROW)
+         KEY_FULL("f", "F", "@", KEY_OFFSET(3), SECOND_ROW)
+         KEY_FULL("g", "G", "*", KEY_OFFSET(4), SECOND_ROW)
+         KEY_FULL("h", "H", "^", KEY_OFFSET(5), SECOND_ROW)
+         KEY_FULL("j", "J", ":", KEY_OFFSET(6), SECOND_ROW)
+         KEY_FULL("k", "K", ";", KEY_OFFSET(7), SECOND_ROW)
          KEY_FULL("l", "L", "~", KEY_OFFSET(8), SECOND_ROW)
 
 #undef INIT_HSPACE
@@ -719,7 +719,7 @@ collections {
                   relative: 1.0 1.0;                                   \
                }                                                       \
                text {                                                  \
-                  font: "DroidSans";                                   \
+                  font: "Regular";                                     \
                   size: (28*SCALE);                                    \
                   text: val;                                           \
                }                                                       \
@@ -897,32 +897,32 @@ collections {
          KEY("6", "_",  KEY_OFFSET(5), FIRST_ROW)
          KEY("7", "\\", KEY_OFFSET(6), FIRST_ROW)
          KEY("8", "|",  KEY_OFFSET(7), FIRST_ROW)
-         KEY("9", "<",  KEY_OFFSET(8), FIRST_ROW)
-         KEY("0", ">",  KEY_OFFSET(9), FIRST_ROW)
+         KEY("9", "$",  KEY_OFFSET(8), FIRST_ROW)
+         KEY("0", "£",  KEY_OFFSET(9), FIRST_ROW)
 
 #undef INIT_HSPACE
 #define INIT_HSPACE (45*SCALE)
 
-         SKEY("-", "dash",       "{", KEY_OFFSET(0), SECOND_ROW)
-         SKEY("@", "at",         "}", KEY_OFFSET(1), SECOND_ROW)
-         SKEY("*", "star",       "[", KEY_OFFSET(2), SECOND_ROW)
-         SKEY("^", "circumflex", "]", KEY_OFFSET(3), SECOND_ROW)
-         SKEY(":", "colon",      "$", KEY_OFFSET(4), SECOND_ROW)
-         SKEY(";", "semi_colon", "£", KEY_OFFSET(5), SECOND_ROW)
-         SKEY("(", "open_par",   "¥", KEY_OFFSET(6), SECOND_ROW)
-         SKEY(")", "close_par",  "€", KEY_OFFSET(7), SECOND_ROW)
-         SKEY("~", "tilde",      "₩", KEY_OFFSET(8), SECOND_ROW)
+         SKEY("(", "open_par",    "{", KEY_OFFSET(0), SECOND_ROW)
+         SKEY(")", "close_par",   "}", KEY_OFFSET(1), SECOND_ROW)
+         SKEY("-", "dash",        "×", KEY_OFFSET(2), SECOND_ROW)
+         SKEY("@", "at",          "÷", KEY_OFFSET(3), SECOND_ROW)
+         SKEY("*", "star",        "®", KEY_OFFSET(4), SECOND_ROW)
+         SKEY("^", "circumflex",  "©", KEY_OFFSET(5), SECOND_ROW)
+         SKEY(":", "colon",       "¢", KEY_OFFSET(6), SECOND_ROW)
+         SKEY(";", "semi_colon",  "¥", KEY_OFFSET(7), SECOND_ROW)
+         SKEY("~", "tilde",       "€", KEY_OFFSET(8), SECOND_ROW)
 
 #undef INIT_HSPACE
 #define INIT_HSPACE (110*SCALE)
 
-         SKEY("/",  "slash",        "¢", KEY_OFFSET(0), THIRD_ROW)
-         SKEY("'",  "single_quote", "`", KEY_OFFSET(1), THIRD_ROW)
-         SKEY("\"", "double_quote", "°", KEY_OFFSET(2), THIRD_ROW)
-         SKEY(".",  "dot",          "˙", KEY_OFFSET(3), THIRD_ROW)
-         SKEY(",",  "comma",        "®", KEY_OFFSET(4), THIRD_ROW)
-         SKEY("?",  "question",     "©", KEY_OFFSET(5), THIRD_ROW)
-         SKEY("!",  "exclamation",  "¿", KEY_OFFSET(6), THIRD_ROW)
+         SKEY("/",  "slash",        "[", KEY_OFFSET(0), THIRD_ROW)
+         SKEY("'",  "single_quote", "]", KEY_OFFSET(1), THIRD_ROW)
+         SKEY("\"", "double_quote", "`", KEY_OFFSET(2), THIRD_ROW)
+         SKEY(".",  "dot",          "<", KEY_OFFSET(3), THIRD_ROW)
+         SKEY(",",  "comma",        ">", KEY_OFFSET(4), THIRD_ROW)
+         SKEY("?",  "question",     "¿", KEY_OFFSET(5), THIRD_ROW)
+         SKEY("!",  "exclam",       "¡", KEY_OFFSET(6), THIRD_ROW)
 
          KEY_SPECIAL_TEXT("1/2", (5*SCALE), THIRD_ROW, (85*SCALE))
          KEY_SPECIAL_TEXT("abc", (5*SCALE), FOURTH_ROW, (95*SCALE))
@@ -945,32 +945,32 @@ collections {
          SKEY("_",  "underline", "6", KEY_OFFSET(5), FIRST_ROW)
          SKEY("\\", "backslash", "7", KEY_OFFSET(6), FIRST_ROW)
          SKEY("|",  "vert_bar",  "8", KEY_OFFSET(7), FIRST_ROW)
-         SKEY("<",  "less",      "9", KEY_OFFSET(8), FIRST_ROW)
-         SKEY(">",  "greater",   "0", KEY_OFFSET(9), FIRST_ROW)
+         SKEY("$",  "dollar",    "9", KEY_OFFSET(8), FIRST_ROW)
+         SKEY("£",  "sterling",  "0", KEY_OFFSET(9), FIRST_ROW)
 
 #undef INIT_HSPACE
 #define INIT_HSPACE (45*SCALE)
 
-         SKEY("{", "open_brace",    "-", KEY_OFFSET(0), SECOND_ROW)
-         SKEY("}", "close_brace",   "@", KEY_OFFSET(1), SECOND_ROW)
-         SKEY("[", "open_bracket",  "*", KEY_OFFSET(2), SECOND_ROW)
-         SKEY("]", "close_bracket", "^", KEY_OFFSET(3), SECOND_ROW)
-         SKEY("$", "dollar",        ":", KEY_OFFSET(4), SECOND_ROW)
-         SKEY("£", "pound",         ";", KEY_OFFSET(5), SECOND_ROW)
-         SKEY("¥", "yen",           "(", KEY_OFFSET(6), SECOND_ROW)
-         SKEY("€", "euro",          ")", KEY_OFFSET(7), SECOND_ROW)
-         SKEY("₩", "won",           "~", KEY_OFFSET(8), SECOND_ROW)
+         SKEY("{", "open_brace",    "(", KEY_OFFSET(0), SECOND_ROW)
+         SKEY("}", "close_brace",   ")", KEY_OFFSET(1), SECOND_ROW)
+         SKEY("×", "multiply",      "-", KEY_OFFSET(2), SECOND_ROW)
+         SKEY("÷", "division",      "@", KEY_OFFSET(3), SECOND_ROW)
+         SKEY("®", "registered",    "*", KEY_OFFSET(4), SECOND_ROW)
+         SKEY("©", "copyright",     "^", KEY_OFFSET(5), SECOND_ROW)
+         SKEY("¢", "cent",          ":", KEY_OFFSET(6), SECOND_ROW)
+         SKEY("¥", "yen",           ";", KEY_OFFSET(7), SECOND_ROW)
+         SKEY("€", "euro",          "~", KEY_OFFSET(8), SECOND_ROW)
 
 #undef INIT_HSPACE
 #define INIT_HSPACE (110*SCALE)
 
-         SKEY("¢", "cent" ,        "/",  KEY_OFFSET(0), THIRD_ROW)
-         SKEY("`", "back_quote",   "'",  KEY_OFFSET(1), THIRD_ROW)
-         SKEY("°", "ring",         "\"", KEY_OFFSET(2), THIRD_ROW)
-         SKEY("˙", "dot",          ".",  KEY_OFFSET(3), THIRD_ROW)
-         SKEY("®", "registered",   ",",  KEY_OFFSET(4), THIRD_ROW)
-         SKEY("©", "copyright",    "?",  KEY_OFFSET(5), THIRD_ROW)
-         SKEY("¿", "inv_question", "!",  KEY_OFFSET(6), THIRD_ROW)
+         SKEY("[", "open_bracket" ,    "/",  KEY_OFFSET(0), THIRD_ROW)
+         SKEY("]", "close_bracket",    "'",  KEY_OFFSET(1), THIRD_ROW)
+         SKEY("`", "back_quote",       "\"", KEY_OFFSET(2), THIRD_ROW)
+         SKEY("<", "less_than",        ".",  KEY_OFFSET(3), THIRD_ROW)
+         SKEY(">", "greater_than",     ",",  KEY_OFFSET(4), THIRD_ROW)
+         SKEY("¿", "questiondown",     "?",  KEY_OFFSET(5), THIRD_ROW)
+         SKEY("¡", "exclamdown",       "!",  KEY_OFFSET(6), THIRD_ROW)
 
          KEY_SPECIAL_TEXT("2/2", (5*SCALE), THIRD_ROW, (85*SCALE))
          KEY_SPECIAL_TEXT("abc", (5*SCALE), FOURTH_ROW, (95*SCALE))
