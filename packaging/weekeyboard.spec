@@ -52,4 +52,5 @@ make %{?_smp_mflags}
 %license COPYING
 %{_bindir}/weekeyboard
 %{_datadir}/weekeyboard/*.edj
+%{_datadir}/X11/xkb/symbols/wkb
 
