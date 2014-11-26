@@ -1,3 +1,43 @@
+* Thu Nov 27 2014 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> v0.0.3-12-g52b35bd
+- wkb-ibus: Fix repeatly create ibus-daemon.
+- Initialize ecore_wayland
+- Fix initialization of custom-font key
+- Add access to ibus-config settings from the application.
+- Accessor for string_list keys
+- Better use of _config_section_init function
+- Pointers to data descriptors now members of respective sections
+- Refactor config_eet to store more than one toplevel section
+- New specific Weekeyboard config section and "theme" key
+- Add section id to struct wkb_config_key
+- New function wkb_ibus_config_eet_dump
+- Accessor for struct wkb_config_key
+- Properly handle 'ValueChanged' config signal
+- Support for different themes
+- Decrease level of severity for debug message
+- Fix set_value for string_list keys
+- Fix return value for _key_basic_get
+- New function for updating a config section
+- Add configuration sections for pinyin and bopomofo engines
+- Adjust long press timer to a lower value
+- Add default_1080 theme
+- Fix themes Makefile
+- Add repeat-on-hold feature to space/backspace keys
+- Adding ability to recognize some UTF8 symbols on the keyboard.
+- Replace default theme font with SourceSansPro
+- Release 0.0.3
+- Added Tizen packaging
+- Updated package revision
+- Update packaging for version 0.0.2
+- Added dependency of ibus engines
+- disable ibus in mobile segment
+- Revert "disable ibus in mobile segment"
+- weekeyboard should not try to build into a pure x11 platform.
+- Convert spec macro %configure to %reconfigure to fix automake issue. Signed-off-by: Ronan Le Martret <ronan@fridu.net>
+- packaging: cleanup, exclude if not wayland
+- packaging: use upstream tag
+- FIxed little typo.
+- Update package version to 0.0.3
+
 * Wed Dec 18 2013 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> accepted/tizen_ivi_stable/20131119.040406@5fa32b2
 - Added dependency of ibus engines
 
