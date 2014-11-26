@@ -1,7 +1,7 @@
 %bcond_with wayland
 
 Name:           weekeyboard
-Version:        0.0.2
+Version:        0.0.3
 Release:        0
 License:        Apache-2.0
 Summary:        Virtual Keyboard Application
@@ -40,7 +40,7 @@ cp %{SOURCE1001} .
 
 %build
 
-%reconfigure --disable-ibus
+%reconfigure
 make %{?_smp_mflags}
 
 %install
@@ -52,4 +52,4 @@ make %{?_smp_mflags}
 %license COPYING
 %{_bindir}/weekeyboard
 %{_datadir}/weekeyboard/*.edj
-
+%{_datadir}/X11/xkb/symbols/wkb
