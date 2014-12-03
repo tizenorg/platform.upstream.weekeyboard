@@ -2,7 +2,7 @@
 
 Name:           weekeyboard
 Version:        0.0.3
-Release:        0
+Release:        1
 License:        Apache-2.0
 Summary:        Virtual Keyboard Application
 Url:            http://github.com/etrunko/weekeyboard

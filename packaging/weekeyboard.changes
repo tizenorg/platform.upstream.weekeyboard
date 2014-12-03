@@ -1,3 +1,7 @@
+* Wed Dec 03 2014 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> v0.0.3-14-g163389c
+- Update package version
+- Correct duplicate key hits when theme is changed.
+
 * Thu Nov 27 2014 Eduardo Lima (Etrunko) <eduardo.lima@intel.com> v0.0.3-12-g52b35bd
 - wkb-ibus: Fix repeatly create ibus-daemon.
 - Initialize ecore_wayland
